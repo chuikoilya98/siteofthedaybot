@@ -1,10 +1,16 @@
 import requests
 from bs4 import BeautifulSoup
+import random
+import sqlite3
+
+class Database() :
+    pass
 
 class Inspiration() :
 
     mainUrl = 'https://www.awwwards.com/'
     searchUrl = 'https://www.awwwards.com/inspiration/search?text='
+    randomUrl = 'https://www.awwwards.com/websites/nominees/'
     searchParam = '&type=submission'
     headers = {
             'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36'    
@@ -36,7 +42,7 @@ class Inspiration() :
             index = 0
             
             for item in items :
-                while index < 10 :
+                while index < 10 or index < len(items) :
                     links.append(item['href'])
                     index += 1
 
@@ -53,3 +59,19 @@ class Inspiration() :
             text = 'К сожалению, я ничего не нашел. Попробуй другой поисковый запрос'
             #make db action
             return text
+
+    def getRandomSite(self) -> str :
+        url = self.randomUrl
+        html = requests.get(url, headers=self.headers)
+        html.encoding = 'utf-8'
+        soup = BeautifulSoup(html.text, 'lxml')
+
+        sites = soup.find_all('a', class_='button x-small border-black circle js-visit-item')
+        index = random.randint(0, len(sites))
+
+        site = sites[index]['href']
+
+        text = f'Рандомный сайт - {site}'
+
+        return text
+
