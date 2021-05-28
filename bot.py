@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import random
+import datetime
+import time
 import sqlite3
 import logging
 from telegram import Update
@@ -98,8 +100,10 @@ def job(context: CallbackContext) -> None :
 
 def sendDailyMessage(update: Update, context: CallbackContext) -> None:
     chat_id = update.message.chat_id
-    context.job_queue.run_daily(callback = job,time = None, context= chat_id, name= str(chat_id))
-
+    timer = datetime.datetime.strptime('17:51:00.000000', '%H:%M:%S.%f')
+    context.job_queue.run_daily(callback = job,time = timer, context= chat_id, name= str(chat_id))
+    print(timer)
+    #https://pythonru.com/primery/kak-ispolzovat-modul-datetime-v-python
 def main() -> None:
 
     updater = Updater("1755982457:AAGzuubLxQMJ36h8wjDsgTjvHZgUW6wiyRE")
@@ -109,11 +113,14 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("siteoftheday", sendDailyMessage))
 
-    # Start the Bot
     updater.start_polling()
 
     updater.idle()
 
 
 if __name__ == '__main__':
+    
+    current_date_time = datetime.datetime.now()
+    current_time = current_date_time.time()
+    print(current_time)
     main()
