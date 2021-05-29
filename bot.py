@@ -6,7 +6,7 @@ import time
 import sqlite3
 import logging
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext
+from telegram.ext import Updater, CommandHandler, CallbackContext , MessageHandler, Filters
 
 #TODO: Перенести в разные файлы
 class Database() :
@@ -95,6 +95,13 @@ def start(update: Update, _: CallbackContext) -> None :
 
     update.message.reply_text(f'Привет, {name}! я бот, который умеет искать и предлагать необычные сайты. Чтобы подписаться на ежедневную рассылку, нажми /siteoftheday')
 
+def findSites(update: Update, context: CallbackContext)-> None :
+    search = update.message.text
+    context.bot.send_message(chat_id=update.effective_chat.id, text='Секундочку, ищу примеры')
+    aww = Inspiration()
+    text = aww.getInspiration(search)
+    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
 def job(context: CallbackContext) -> None :
     
     job = context.job
@@ -120,7 +127,8 @@ def main() -> None:
     dispatcher = updater.dispatcher
 
     dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("time", timer))
+    dispatcher.add_handler(CommandHandler("timer", timer))
+    dispatcher.add_handler(MessageHandler(Filters.text & (~Filters.command), findSites))
     dispatcher.add_handler(CommandHandler("siteoftheday", sendDailyMessage))
 
     updater.start_polling()
