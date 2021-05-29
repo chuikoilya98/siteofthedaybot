@@ -89,7 +89,11 @@ logger = logging.getLogger(__name__)
 
 def start(update: Update, _: CallbackContext) -> None :
     #make db write for info about User
-    update.message.reply_text('Привет, я бот, который умеет искать и предлагать необычные сайты. Чтобы подписаться на ежедневную рассылку, нажми /siteoftheday')
+
+    info = update.message.from_user
+    name = info.first_name
+
+    update.message.reply_text(f'Привет, {name}! я бот, который умеет искать и предлагать необычные сайты. Чтобы подписаться на ежедневную рассылку, нажми /siteoftheday')
 
 def job(context: CallbackContext) -> None :
     
@@ -100,10 +104,15 @@ def job(context: CallbackContext) -> None :
 
 def sendDailyMessage(update: Update, context: CallbackContext) -> None:
     chat_id = update.message.chat_id
-    timer = datetime.datetime.strptime('17:51:00.000000', '%H:%M:%S.%f')
-    context.job_queue.run_daily(callback = job,time = timer, context= chat_id, name= str(chat_id))
-    print(timer)
+    timer = datetime.datetime.strptime('11:50:00.000000', '%H:%M:%S.%f')
+    context.job_queue.run_daily(callback = job,time = timer.time(), context= chat_id, name= str(chat_id))
     #https://pythonru.com/primery/kak-ispolzovat-modul-datetime-v-python
+
+def timer(update: Update, _: CallbackContext) -> None :
+    
+    text = str(datetime.datetime.now())
+    update.message.reply_text(text)
+
 def main() -> None:
 
     updater = Updater("1755982457:AAGzuubLxQMJ36h8wjDsgTjvHZgUW6wiyRE")
@@ -111,13 +120,14 @@ def main() -> None:
     dispatcher = updater.dispatcher
 
     dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("time", timer))
     dispatcher.add_handler(CommandHandler("siteoftheday", sendDailyMessage))
 
     updater.start_polling()
 
     updater.idle()
 
-
+    
 if __name__ == '__main__':
     
     current_date_time = datetime.datetime.now()
