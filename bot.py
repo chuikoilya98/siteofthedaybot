@@ -42,6 +42,7 @@ class Inspiration() :
         html = requests.get(url, headers=self.headers)
         html.encoding = 'utf-8'
         soup = BeautifulSoup(html.text, 'lxml')
+        print(html.status_code)
 
         try :
             items = soup.find_all('a', class_='button x-small border-black circle js-visit-item')
@@ -77,10 +78,14 @@ class Inspiration() :
 
         sites = soup.find_all('a', class_='button x-small border-black circle js-visit-item')
         index = random.randint(0, len(sites))
+        print(index)
+
 
         site = sites[index]['href']
 
         text = f'Рандомный сайт - {site}'
+
+        print(text)
 
         return text
 
@@ -123,6 +128,12 @@ def timer(update: Update, _: CallbackContext) -> None :
     text = str(datetime.datetime.now())
     update.message.reply_text(text)
 
+def randomSite(update: Update, context: CallbackContext) -> None :
+    context.bot.send_message(chat_id=update.effective_chat.id, text='Подбираю рандомный сайт')
+    aww = Inspiration()
+    text = aww.getRandomSite()
+    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+
 def main() -> None:
 
     updater = Updater("1755982457:AAGzuubLxQMJ36h8wjDsgTjvHZgUW6wiyRE")
@@ -131,8 +142,9 @@ def main() -> None:
 
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("timer", timer))
-    dispatcher.add_handler(MessageHandler(Filters.text & (~Filters.command), findSites))
+    dispatcher.add_handler(CommandHandler("random", randomSite))
     dispatcher.add_handler(CommandHandler("siteoftheday", sendDailyMessage))
+    dispatcher.add_handler(MessageHandler(Filters.text & (~Filters.command), findSites))
 
     updater.start_polling()
 
