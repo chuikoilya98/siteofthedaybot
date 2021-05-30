@@ -101,7 +101,7 @@ def start(update: Update, _: CallbackContext) -> None :
     info = update.message.from_user
     name = info.first_name
 
-    update.message.reply_text(f'Привет, {name}! я бот, который умеет искать и предлагать необычные сайты. Чтобы подписаться на ежедневную рассылку, нажми /siteoftheday')
+    update.message.reply_text(f'Привет, {name}! я бот, который умеет искать и предлагать необычные сайты. \n 1. Чтобы подписаться на ежедневную рассылку, нажми /siteoftheday \n 2. Чтобы получить ссылку на рандомный сайт, нажми /random \n 3. Чтобы найти сайты примеры, напиши поисковый запросы на английском ')
 
 def findSites(update: Update, context: CallbackContext)-> None :
     search = update.message.text
