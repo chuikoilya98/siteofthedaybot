@@ -38,6 +38,7 @@ class Inspiration() :
     def getInspiration(self,request:str) -> str :
 
         url = self.searchUrl + request + self.searchParam
+
         html = requests.get(url, headers=self.headers)
         html.encoding = 'utf-8'
         soup = BeautifulSoup(html.text, 'lxml')
@@ -48,14 +49,16 @@ class Inspiration() :
             index = 0
             
             for item in items :
-                while index < 10 or index < len(items) :
+                if index != 10 :
                     links.append(item['href'])
                     index += 1
-
+                else:
+                    break
             text = 'Я нашел такие сайты : \n'
 
             for i in links: 
                 text += i
+                text += ' \n'
 
             #make db action
             return text                
