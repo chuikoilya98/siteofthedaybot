@@ -121,7 +121,7 @@ def sendDailyMessage(update: Update, context: CallbackContext) -> None:
     chat_id = update.message.chat_id
     timer = datetime.datetime.strptime('11:50:00.000000', '%H:%M:%S.%f')
     context.job_queue.run_daily(callback = job,time = timer.time(), context= chat_id, name= str(chat_id))
-    #https://pythonru.com/primery/kak-ispolzovat-modul-datetime-v-python
+    context.bot.send_message(chat_id=update.effective_chat.id, text='Теперь ты подписан на ежедневную рассылку!')
 
 def timer(update: Update, _: CallbackContext) -> None :
     
