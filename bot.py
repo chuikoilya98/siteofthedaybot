@@ -119,9 +119,9 @@ def job(context: CallbackContext) -> None :
 
 def sendDailyMessage(update: Update, context: CallbackContext) -> None:
     chat_id = update.message.chat_id
-    timer = datetime.datetime.strptime('11:50:00.000000', '%H:%M:%S.%f')
+    timer = datetime.datetime.strptime('12:30:00.000000', '%H:%M:%S.%f')
     context.job_queue.run_daily(callback = job,time = timer.time(), context= chat_id, name= str(chat_id))
-    context.bot.send_message(chat_id=update.effective_chat.id, text='Теперь ты подписан на ежедневную рассылку!')
+    context.bot.send_message(chat_id=update.effective_chat.id, text=f'Теперь ты подписан на ежедневную рассылку! {str(chat_id)}')
 
 def timer(update: Update, _: CallbackContext) -> None :
     
