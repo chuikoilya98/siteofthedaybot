@@ -101,7 +101,7 @@ def start(update: Update, _: CallbackContext) -> None :
     info = update.message.from_user
     name = info.first_name
 
-    update.message.reply_text(f'Привет, {name}! я бот, который умеет искать и предлагать необычные сайты. \n 1. Чтобы подписаться на ежедневную рассылку, нажми /siteoftheday \n 2. Чтобы получить ссылку на рандомный сайт, нажми /random \n 3. Чтобы найти сайты примеры, напиши поисковый запросы на английском ')
+    update.message.reply_text(f'Привет, {name}! я бот, который умеет искать и предлагать необычные сайты. \n 1. Чтобы подписаться на ежедневную рассылку, напиши в чат команду  /siteoftheday "Час". Пример - /siteoftheday 14 \n 2. Чтобы получить ссылку на рандомный сайт, нажми /random \n 3. Чтобы найти сайты примеры, напиши поисковый запросы на английском ')
 
 def findSites(update: Update, context: CallbackContext)-> None :
     search = update.message.text
@@ -119,9 +119,10 @@ def job(context: CallbackContext) -> None :
 
 def sendDailyMessage(update: Update, context: CallbackContext) -> None:
     chat_id = update.message.chat_id
-    timer = datetime.datetime.strptime('12:30:00.000000', '%H:%M:%S.%f')
+    hour = int(context.args[0])
+    timer = datetime.datetime.strptime(f'{hour-5}:00:00.000000', '%H:%M:%S.%f')
     context.job_queue.run_daily(callback = job,time = timer.time(), context= chat_id, name= str(chat_id))
-    context.bot.send_message(chat_id=update.effective_chat.id, text=f'Теперь ты подписан на ежедневную рассылку! {str(chat_id)}')
+    context.bot.send_message(chat_id=update.effective_chat.id, text=f'Теперь ты подписан на ежедневную рассылку! Она будет приходить каждый день в {hour}:00')
 
 def timer(update: Update, _: CallbackContext) -> None :
     
