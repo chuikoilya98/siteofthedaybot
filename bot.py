@@ -95,6 +95,15 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+def remove_job_if_exists(name: str, context: CallbackContext) -> bool:
+
+    current_jobs = context.job_queue.get_jobs_by_name(name)
+    if not current_jobs:
+        return False
+    for job in current_jobs:
+        job.schedule_removal()
+    return True
+
 def start(update: Update, _: CallbackContext) -> None :
     #make db write for info about User
 
@@ -121,6 +130,7 @@ def sendDailyMessage(update: Update, context: CallbackContext) -> None:
     chat_id = update.message.chat_id
     hour = int(context.args[0])
     timer = datetime.datetime.strptime(f'{hour-5}:00:00.000000', '%H:%M:%S.%f')
+	 job_removed = remove_job_if_exists(str(chat_id), context)
     context.job_queue.run_daily(callback = job,time = timer.time(), context= chat_id, name= str(chat_id))
     context.bot.send_message(chat_id=update.effective_chat.id, text=f'Теперь ты подписан на ежедневную рассылку! Она будет приходить каждый день в {hour}:00')
 
