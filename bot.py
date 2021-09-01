@@ -10,7 +10,7 @@ from telegram.ext import Updater, CommandHandler, CallbackContext , MessageHandl
 
 #TODO: Перенести в разные файлы
 class Database() :
-    pass
+   pass
 
 class Inspiration() :
 
@@ -90,81 +90,80 @@ class Inspiration() :
         return text
 
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+   format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 
 logger = logging.getLogger(__name__)
 
 def remove_job_if_exists(name: str, context: CallbackContext) -> bool:
 
-    current_jobs = context.job_queue.get_jobs_by_name(name)
-    if not current_jobs:
-        return False
-    for job in current_jobs:
-        job.schedule_removal()
-    return True
+   current_jobs = context.job_queue.get_jobs_by_name(name)
+   if not current_jobs:
+      return False
+   for job in current_jobs:
+      job.schedule_removal()
+   return True
 
 def start(update: Update, _: CallbackContext) -> None :
-    #make db write for info about User
+   #make db write for info about User
 
-    info = update.message.from_user
-    name = info.first_name
+   info = update.message.from_user
+   name = info.first_name
 
-    update.message.reply_text(f'Привет, {name}! я бот, который умеет искать и предлагать необычные сайты. \n 1. Чтобы подписаться на ежедневную рассылку, напиши в чат команду  /siteoftheday "Час". Пример - /siteoftheday 14 \n 2. Чтобы получить ссылку на рандомный сайт, нажми /random \n 3. Чтобы найти сайты примеры, напиши поисковый запросы на английском ')
+   update.message.reply_text(f'Привет, {name}! я бот, который умеет искать и предлагать необычные сайты. \n 1. Чтобы подписаться на ежедневную рассылку, напиши в чат команду  /siteoftheday "Час". Пример - /siteoftheday 14 \n 2. Чтобы получить ссылку на рандомный сайт, нажми /random \n 3. Чтобы найти сайты примеры, напиши поисковый запросы на английском ')
 
 def findSites(update: Update, context: CallbackContext)-> None :
-    search = update.message.text
-    context.bot.send_message(chat_id=update.effective_chat.id, text='Секундочку, ищу примеры')
-    aww = Inspiration()
-    text = aww.getInspiration(search)
-    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+   search = update.message.text
+   context.bot.send_message(chat_id=update.effective_chat.id, text='Секундочку, ищу примеры')
+   aww = Inspiration()
+   text = aww.getInspiration(search)
+   context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 def job(context: CallbackContext) -> None :
     
-    job = context.job
-    aww = Inspiration()
-    text = aww.getSiteOfTheDay()
-    context.bot.send_message(job.context, text = text)
+   job = context.job
+   aww = Inspiration()
+   text = aww.getSiteOfTheDay()
+   context.bot.send_message(job.context, text = text)
 
 def sendDailyMessage(update: Update, context: CallbackContext) -> None:
-    chat_id = update.message.chat_id
-    hour = int(context.args[0])
-    timer = datetime.datetime.strptime(f'{hour-5}:00:00.000000', '%H:%M:%S.%f')
-	 job_removed = remove_job_if_exists(str(chat_id), context)
-    context.job_queue.run_daily(callback = job,time = timer.time(), context= chat_id, name= str(chat_id))
-    context.bot.send_message(chat_id=update.effective_chat.id, text=f'Теперь ты подписан на ежедневную рассылку! Она будет приходить каждый день в {hour}:00')
+   chat_id = update.message.chat_id
+   hour = int(context.args[0])
+   timer = datetime.datetime.strptime(f'{hour-5}:00:00.000000', '%H:%M:%S.%f')
+	job_removed = remove_job_if_exists(str(chat_id), context)
+   context.job_queue.run_daily(callback = job,time = timer.time(), context= chat_id, name= str(chat_id))
+   context.bot.send_message(chat_id=update.effective_chat.id, text=f'Теперь ты подписан на ежедневную рассылку! Она будет приходить каждый день в {hour}:00')
 
 def timer(update: Update, _: CallbackContext) -> None :
     
-    text = str(datetime.datetime.now())
-    update.message.reply_text(text)
+   text = str(datetime.datetime.now())
+   update.message.reply_text(text)
 
 def randomSite(update: Update, context: CallbackContext) -> None :
-    context.bot.send_message(chat_id=update.effective_chat.id, text='Подбираю рандомный сайт')
-    aww = Inspiration()
-    text = aww.getRandomSite()
-    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+   context.bot.send_message(chat_id=update.effective_chat.id, text='Подбираю рандомный сайт')
+   aww = Inspiration()
+   text = aww.getRandomSite()
+   context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 def main() -> None:
 
-    updater = Updater("1755982457:AAGzuubLxQMJ36h8wjDsgTjvHZgUW6wiyRE")
+   updater = Updater("1755982457:AAGzuubLxQMJ36h8wjDsgTjvHZgUW6wiyRE")
 
-    dispatcher = updater.dispatcher
+   dispatcher = updater.dispatcher
 
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("timer", timer))
-    dispatcher.add_handler(CommandHandler("random", randomSite))
-    dispatcher.add_handler(CommandHandler("siteoftheday", sendDailyMessage))
-    dispatcher.add_handler(MessageHandler(Filters.text & (~Filters.command), findSites))
+   dispatcher.add_handler(CommandHandler("start", start))
+   dispatcher.add_handler(CommandHandler("timer", timer))
+   dispatcher.add_handler(CommandHandler("random", randomSite))
+   dispatcher.add_handler(CommandHandler("siteoftheday", sendDailyMessage))
+   dispatcher.add_handler(MessageHandler(Filters.text & (~Filters.command), findSites))
 
-    updater.start_polling()
+   updater.start_polling()
 
-    updater.idle()
+   updater.idle()
 
     
 if __name__ == '__main__':
     
-    current_date_time = datetime.datetime.now()
-    current_time = current_date_time.time()
-    print(current_time)
-    main()
+   current_date_time = datetime.datetime.now()
+   current_time = current_date_time.time()
+   main()
