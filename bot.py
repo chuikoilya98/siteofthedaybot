@@ -14,80 +14,75 @@ class Database() :
 
 class Inspiration() :
 
-    mainUrl = 'https://www.awwwards.com/'
-    searchUrl = 'https://www.awwwards.com/inspiration/search?text='
-    randomUrl = 'https://www.awwwards.com/websites/nominees/'
-    searchParam = '&type=submission'
-    headers = {
+   mainUrl = 'https://www.awwwards.com/'
+   searchUrl = 'https://www.awwwards.com/inspiration/search?text='
+   randomUrl = 'https://www.awwwards.com/websites/nominees/'
+   searchParam = '&type=submission'
+   headers = {
             'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36'    
         }
 
-    def getSiteOfTheDay(self) -> str :
+   def getSiteOfTheDay(self) -> str :
 
-        html = requests.get(self.mainUrl, headers=self.headers)
-        html.encoding = 'utf-8'
-        soup = BeautifulSoup(html.text, 'lxml')
+      html = requests.get(self.mainUrl, headers=self.headers)
+      html.encoding = 'utf-8'
+      soup = BeautifulSoup(html.text, 'lxml')
 
-        link = soup.find('div', class_='box-bl gap')
-        siteOfTheDay = link.find('a')['href']
+      link = soup.find('div', class_='box-bl gap')
+      siteOfTheDay = link.find('a')['href']
 
-        text = f"Интересный сайт на сегодня - {siteOfTheDay}"
+      text = f"Интересный сайт на сегодня - {siteOfTheDay}"
 
-        return text
+      return text
 
-    def getInspiration(self,request:str) -> str :
+   def getInspiration(self,request:str) -> str :
 
-        url = self.searchUrl + request + self.searchParam
+      url = self.searchUrl + request + self.searchParam
 
-        html = requests.get(url, headers=self.headers)
-        html.encoding = 'utf-8'
-        soup = BeautifulSoup(html.text, 'lxml')
-        print(html.status_code)
+      html = requests.get(url, headers=self.headers)
+      html.encoding = 'utf-8'
+      soup = BeautifulSoup(html.text, 'lxml')
 
-        try :
-            items = soup.find_all('a', class_='button x-small border-black circle js-visit-item')
-            links =[]
-            index = 0
+      try :
+         items = soup.find_all('a', class_='button x-small border-black circle js-visit-item')
+         links =[]
+         index = 0
             
-            for item in items :
-                if index != 10 :
-                    links.append(item['href'])
-                    index += 1
-                else:
-                    break
+         for item in items :
+            if index != 10 :
+               links.append(item['href'])
+               index += 1
+            else:
+               break
             text = 'Я нашел такие сайты : \n'
 
             for i in links: 
-                text += i
-                text += ' \n'
+               text += i
+               text += ' \n'
 
             #make db action
             return text                
 
-        except AttributeError:
+      except AttributeError:
 
-            text = 'К сожалению, я ничего не нашел. Попробуй другой поисковый запрос'
+         text = 'К сожалению, я ничего не нашел. Попробуй другой поисковый запрос'
             #make db action
-            return text
+         return text
 
-    def getRandomSite(self) -> str :
-        url = self.randomUrl
-        html = requests.get(url, headers=self.headers)
-        html.encoding = 'utf-8'
-        soup = BeautifulSoup(html.text, 'lxml')
+   def getRandomSite(self) -> str :
+      url = self.randomUrl
+      html = requests.get(url, headers=self.headers)
+      html.encoding = 'utf-8'
+      soup = BeautifulSoup(html.text, 'lxml')
 
-        sites = soup.find_all('a', class_='button x-small border-black circle js-visit-item')
-        index = random.randint(0, len(sites))
-        print(index)
+      sites = soup.find_all('a', class_='button x-small border-black circle js-visit-item')
+      index = random.randint(0, len(sites))
+      
+      site = sites[index]['href']
 
-
-        site = sites[index]['href']
-
-        text = f'Рандомный сайт - {site}'
-
-        print(text)
-
-        return text
+      text = f'Рандомный сайт - {site}'
+      
+      return text
 
 logging.basicConfig(
    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
@@ -130,7 +125,7 @@ def sendDailyMessage(update: Update, context: CallbackContext) -> None:
    chat_id = update.message.chat_id
    hour = int(context.args[0])
    timer = datetime.datetime.strptime(f'{hour-5}:00:00.000000', '%H:%M:%S.%f')
-	job_removed = remove_job_if_exists(str(chat_id), context)
+   job_removed = remove_job_if_exists(str(chat_id), context)
    context.job_queue.run_daily(callback = job,time = timer.time(), context= chat_id, name= str(chat_id))
    context.bot.send_message(chat_id=update.effective_chat.id, text=f'Теперь ты подписан на ежедневную рассылку! Она будет приходить каждый день в {hour}:00')
 
