@@ -111,18 +111,14 @@ def start(update: Update, _: CallbackContext) -> None :
 
    update.message.reply_text(f'Привет, {name}! я бот, который умеет искать и предлагать необычные сайты. \n 1. Чтобы подписаться на ежедневную рассылку, напиши в чат команду  /siteoftheday "Час". Пример - /siteoftheday 14 \n 2. Чтобы получить ссылку на рандомный сайт, нажми /random \n 3. Чтобы найти сайты примеры, напиши поисковый запросы на английском ')
 
-def sendMessageToAllUsers(update: Update, context: CallbackContext) :
+def getUsersCount(update: Update, context: CallbackContext) :
    adminId = '331392389'
    senderId = str(update.message.from_user.id)
-
    if adminId == senderId :
       db = Database()
-      users = db.getAllUsers(key='id')
-      for user in users :
-         context.bot.send_message(chat_id=user, text=update.message.text)
-      return 'success'
-   else:
-      return 'false'
+      count = db.getAllUsers('count')
+      message = f'Количество пользователей: {count}'
+      context.bot.send_message(chat_id=adminId, text=message)
 
 
 def findSites(update: Update, context: CallbackContext)-> None :
@@ -177,6 +173,7 @@ def main() -> None:
    dispatcher.add_handler(CommandHandler("timer", timer))
    dispatcher.add_handler(CommandHandler("random", randomSite))
    dispatcher.add_handler(CommandHandler("siteoftheday", sendDailyMessage))
+   dispatcher.add_handler(CommandHandler("count", getUsersCount))
    dispatcher.add_handler(MessageHandler(Filters.text & (~Filters.command), findSites))
    
 
