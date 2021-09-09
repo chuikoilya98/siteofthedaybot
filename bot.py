@@ -3,14 +3,10 @@ from bs4 import BeautifulSoup
 import random
 import datetime
 import time
-import sqlite3
 import logging
+from dbconfig import Database
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext , MessageHandler, Filters
-
-#TODO: Перенести в разные файлы
-class Database() :
-   pass
 
 class Inspiration() :
 
@@ -100,19 +96,50 @@ def remove_job_if_exists(name: str, context: CallbackContext) -> bool:
    return True
 
 def start(update: Update, _: CallbackContext) -> None :
-   #make db write for info about User
 
    info = update.message.from_user
+   userId = info.id
    name = info.first_name
+
+   userInfo = {
+      'id' : userId,
+      'name' : name
+   }
+
+   db = Database()
+   kek = db.createNewUser(userInfo)
 
    update.message.reply_text(f'Привет, {name}! я бот, который умеет искать и предлагать необычные сайты. \n 1. Чтобы подписаться на ежедневную рассылку, напиши в чат команду  /siteoftheday "Час". Пример - /siteoftheday 14 \n 2. Чтобы получить ссылку на рандомный сайт, нажми /random \n 3. Чтобы найти сайты примеры, напиши поисковый запросы на английском ')
 
+def sendMessageToAllUsers(update: Update, context: CallbackContext) :
+   adminId = '331392389'
+   senderId = str(update.message.from_user.id)
+
+   if adminId == senderId :
+      db = Database()
+      users = db.getAllUsers(key='id')
+      for user in users :
+         context.bot.send_message(chat_id=user, text=update.message.text)
+      return 'success'
+   else:
+      return 'false'
+
+
 def findSites(update: Update, context: CallbackContext)-> None :
-   search = update.message.text
-   context.bot.send_message(chat_id=update.effective_chat.id, text='Секундочку, ищу примеры')
-   aww = Inspiration()
-   text = aww.getInspiration(search)
-   context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+   adminId = '331392389'
+   senderId = str(update.message.from_user.id)
+   if adminId == senderId :
+      db = Database()
+      users = db.getAllUsers(key='id')
+      for user in users :
+         context.bot.send_message(chat_id=user, text=update.message.text)
+      return 'success'
+   else :
+      search = update.message.text
+      context.bot.send_message(chat_id=update.effective_chat.id, text='Секундочку, ищу примеры')
+      aww = Inspiration()
+      text = aww.getInspiration(search)
+      context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 def job(context: CallbackContext) -> None :
     
@@ -151,6 +178,7 @@ def main() -> None:
    dispatcher.add_handler(CommandHandler("random", randomSite))
    dispatcher.add_handler(CommandHandler("siteoftheday", sendDailyMessage))
    dispatcher.add_handler(MessageHandler(Filters.text & (~Filters.command), findSites))
+   
 
    updater.start_polling()
 
