@@ -4,9 +4,11 @@ from flask import request
 app = Flask(__name__)
 
 
-@app.route('/inspire')
-def index():
-    return 'hello world'
+@app.route('/inspire', methods=["GET", "POST"])
+def receive_update():
+    if request.method == "POST":
+        print(request.json)
+    return {"ok": True}
 
 
 if __name__ == '__main__':
